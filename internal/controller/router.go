@@ -1,12 +1,16 @@
 package controller
 
 import (
+	_ "GoLessonFifteen/docs"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 )
 
 func (ctrl Controller) RegisterEndpoints() {
 	ctrl.router.GET("/ping", ctrl.Ping)
+	ctrl.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	ctrl.router.GET("/users", ctrl.GetAllUsers)
 	ctrl.router.POST("/users", ctrl.CreateUser)
 	ctrl.router.GET("/users/:id", ctrl.GetUserByID)

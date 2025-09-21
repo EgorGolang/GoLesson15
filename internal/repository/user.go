@@ -5,7 +5,9 @@ import (
 )
 
 func (r *Repository) GetAllUser() (user []models.User, err error) {
-	if err := r.db.Select(&user, `SELECT name, email, age, id FROM users ORDER BY id`); err != nil {
+	err = r.db.Select(&user, `SELECT name, email, age, id FROM users ORDER BY id`)
+	if err != nil {
+		return nil, err
 	}
 	return user, err
 }

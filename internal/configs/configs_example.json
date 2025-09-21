@@ -1,0 +1,15 @@
+{
+  "app_params": {
+    "gin_mode": "",
+    "port_run": "",
+    "server_url": "",
+    "server_name": "UserInfo"
+  },
+  "postgres_params": {
+    "host": "",
+    "port": "",
+    "user": "",
+    "password": "",
+    "database": ""
+  }
+}
