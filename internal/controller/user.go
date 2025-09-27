@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"GoLessonFifteen/internal/errs"
 	"GoLessonFifteen/internal/models"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -18,7 +20,7 @@ import (
 func (ctrl *Controller) GetAllUsers(c *gin.Context) {
 	user, err := ctrl.service.GetAllUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, CommonError{Error: err.Error()})
+		ctrl.HandleError(c, err)
 		return
 	}
 
@@ -40,18 +42,21 @@ type CreateUserRequest struct {
 // @Param request_body body CreateUserRequest true "информания о новом пользователе"
 // @Success 201 {array} models.User
 // @Failure 400 {object} CommonError
+// @Failure 422 {object} CommonError
 // @Failure 500 {object} CommonError
 // @Router /users [post]
 func (ctrl *Controller) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctrl.HandleError(c, errors.Join(errs.ErrInvalidRequestBody, err))
+		return
+	}
+	if user.Name == "" || user.Email == "" || user.Age < 0 {
+		ctrl.HandleError(c, errs.ErrInvalidFieldValuse)
 		return
 	}
 	if err := ctrl.service.CreateUser(user); err != nil {
-		c.JSON(http.StatusInternalServerError, CommonError{Error: err.Error()})
+		ctrl.HandleError(c, err)
 		return
 	}
 	c.JSON(http.StatusCreated, CommonResponse{Message: "User created successfully!"})
@@ -65,18 +70,19 @@ func (ctrl *Controller) CreateUser(c *gin.Context) {
 // @Param id path int true "id продукта"
 // @Success 200 {object} models.User
 // @Failure 400 {object} CommonError
+// @Failure 404 {object} CommonError
 // @Failure 500 {object} CommonError
 // @Router /users/{id} [get]
 func (ctrl *Controller) GetUserByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, CommonError{Error: err.Error()})
+	if err != nil || id < 1 {
+		ctrl.HandleError(c, errs.ErrInvalidUserID)
 		return
 	}
 	user, err := ctrl.service.GetUserByID(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, CommonError{Error: err.Error()})
+		ctrl.HandleError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, user)
@@ -92,29 +98,31 @@ func (ctrl *Controller) GetUserByID(c *gin.Context) {
 // @Param request_body body CreateUserRequest true "информация о пользователе"
 // @Success 200 {object} CommonResponse
 // @Failure 400 {object} CommonError
+// @Failure 404 {object} CommonError
+// @Failure 422 {object} CommonError
 // @Failure 500 {object} CommonError
 // @Router /users/{id} [put]
 func (ctrl *Controller) UpdateUserByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	if err != nil || id < 1 {
+		ctrl.HandleError(c, errs.ErrInvalidUserID)
 		return
 	}
 	var user models.User
 	if err = c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctrl.HandleError(c, errors.Join(errs.ErrInvalidRequestBody, err))
+		return
+	}
+
+	if user.Name == "" || user.Email == "" || user.Age < 0 {
+		ctrl.HandleError(c, errs.ErrInvalidFieldValuse)
 		return
 	}
 	user.ID = id
+
 	if err = ctrl.service.UpdateUserByID(user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		ctrl.HandleError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -130,19 +138,18 @@ func (ctrl *Controller) UpdateUserByID(c *gin.Context) {
 // @Param id path int true "id продукта"
 // @Success 200 {object} CommonResponse
 // @Failure 400 {object} CommonError
+// @Failure 404 {object} CommonError
 // @Failure 500 {object} CommonError
 // @Router /users/{id} [delete]
 func (ctrl *Controller) DeleteUserByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	if err != nil || id < 1 {
+		ctrl.HandleError(c, errs.ErrInvalidUserID)
 		return
 	}
 	if err = ctrl.service.DeleteUserByID(id); err != nil {
-		c.JSON(http.StatusInternalServerError, CommonError{Error: err.Error()})
+		ctrl.HandleError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, CommonResponse{Message: "User deleted successfully!"})

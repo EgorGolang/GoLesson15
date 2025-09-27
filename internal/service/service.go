@@ -1,11 +1,13 @@
 package service
 
-import "GoLessonFifteen/internal/repository"
+import (
+	"GoLessonFifteen/internal/contracts"
+)
 
 type Service struct {
-	repository repository.Repository
+	repository contracts.RepositoryI
 }
 
-func NewService(repository *repository.Repository) *Service {
-	return &Service{repository: *repository}
+func NewService(repository contracts.RepositoryI) *Service {
+	return &Service{repository: repository}
 }

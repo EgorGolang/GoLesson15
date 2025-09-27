@@ -1,0 +1,14 @@
+{
+  "app_params": {
+    "gin_mode": "debug",
+    "port_run": "7780",
+    "server_url": "localhost",
+    "server_name": "UserInfo"
+  },
+  "postgres_params": {
+    "host": "localhost",
+    "port": "5432",
+    "user": "postgres",
+    "database": "go_lesson_15"
+  }
+}

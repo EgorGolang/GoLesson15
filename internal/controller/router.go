@@ -16,12 +16,18 @@ func (ctrl Controller) RegisterEndpoints() {
 	ctrl.router.GET("/users/:id", ctrl.GetUserByID)
 	ctrl.router.PUT("/users/:id", ctrl.UpdateUserByID)
 	ctrl.router.DELETE("/users/:id", ctrl.DeleteUserByID)
+
 }
 
+// Ping
+// @Summary Health-Check
+// @Description Проверка сервиса
+// @Tags Ping
+// @Produce json
+// @Success 200 {object} CommonResponse
+// @Router /ping [get]
 func (ctrl *Controller) Ping(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"ping": "pong",
-	})
+	c.JSON(http.StatusOK, CommonResponse{Message: "Server is running"})
 }
 
 func (ctrl *Controller) RunServer(address string) error {
