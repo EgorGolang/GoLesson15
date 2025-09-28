@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 	"log"
 	"os"
 )
@@ -38,8 +39,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	rdb := redis.NewClient(&redis.Options{
+		Addr: fmt.Sprintf("localhost:6379"),
+		DB:   configs.AppSettings.RedisParams.Database,
+	})
+
+	cache := repository.NewCache(rdb)
+
 	repository := repository.NewRepository(db)
-	svc := service.NewService(repository)
+	svc := service.NewService(repository, cache)
 	ctrl := controller.NewController(svc)
 
 	if err = ctrl.RunServer(fmt.Sprintf(":%s", configs.AppSettings.AppParams.PortRun)); err != nil {

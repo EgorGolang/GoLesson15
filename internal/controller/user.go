@@ -18,7 +18,7 @@ import (
 // @Failure 500 {object} CommonError
 // @Router /users [get]
 func (ctrl *Controller) GetAllUsers(c *gin.Context) {
-	user, err := ctrl.service.GetAllUsers()
+	user, err := ctrl.service.GetAllUsers(c)
 	if err != nil {
 		ctrl.HandleError(c, err)
 		return
@@ -55,7 +55,7 @@ func (ctrl *Controller) CreateUser(c *gin.Context) {
 		ctrl.HandleError(c, errs.ErrInvalidFieldValuse)
 		return
 	}
-	if err := ctrl.service.CreateUser(user); err != nil {
+	if err := ctrl.service.CreateUser(c, user); err != nil {
 		ctrl.HandleError(c, err)
 		return
 	}
@@ -80,7 +80,7 @@ func (ctrl *Controller) GetUserByID(c *gin.Context) {
 		ctrl.HandleError(c, errs.ErrInvalidUserID)
 		return
 	}
-	user, err := ctrl.service.GetUserByID(id)
+	user, err := ctrl.service.GetUserByID(c, id)
 	if err != nil {
 		ctrl.HandleError(c, err)
 		return
@@ -121,7 +121,7 @@ func (ctrl *Controller) UpdateUserByID(c *gin.Context) {
 	}
 	user.ID = id
 
-	if err = ctrl.service.UpdateUserByID(user); err != nil {
+	if err = ctrl.service.UpdateUserByID(c, user); err != nil {
 		ctrl.HandleError(c, err)
 		return
 	}
@@ -148,7 +148,7 @@ func (ctrl *Controller) DeleteUserByID(c *gin.Context) {
 		ctrl.HandleError(c, errs.ErrInvalidUserID)
 		return
 	}
-	if err = ctrl.service.DeleteUserByID(id); err != nil {
+	if err = ctrl.service.DeleteUserByID(c, id); err != nil {
 		ctrl.HandleError(c, err)
 		return
 	}

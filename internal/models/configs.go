@@ -3,6 +3,7 @@ package models
 type Config struct {
 	AppParams      AppParams      `json:"app_params"`
 	PostgresParams PostgresParams `json:"postgres_params"`
+	RedisParams    RedisParams    `json:"redis_params"`
 }
 
 type AppParams struct {
@@ -17,4 +18,10 @@ type PostgresParams struct {
 	Port     string `json:"port"`
 	User     string `json:"user"`
 	Database string `json:"database"`
+}
+
+type RedisParams struct {
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Database int    `json:"database"`
 }
