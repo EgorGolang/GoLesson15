@@ -26,7 +26,7 @@ func (ctrl *Controller) HandleError(c *gin.Context, err error) {
 		c.JSON(http.StatusNotFound, CommonError{Error: err.Error()})
 	case errors.Is(err, errs.ErrInvalidUserID) || errors.Is(err, errs.ErrInvalidRequestBody):
 		c.JSON(http.StatusBadRequest, CommonError{Error: err.Error()})
-	case errors.Is(err, errs.ErrInvalidFieldValuse):
+	case errors.Is(err, errs.ErrInvalidFieldValuse) || errors.Is(err, errs.ErrInvalidUserName):
 		c.JSON(http.StatusUnprocessableEntity, CommonError{Error: err.Error()})
 	default:
 		c.JSON(http.StatusInternalServerError, CommonError{Error: err.Error()})

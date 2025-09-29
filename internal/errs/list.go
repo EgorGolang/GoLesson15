@@ -8,4 +8,5 @@ var (
 	ErrInvalidUserID      = errors.New("invalid user id")
 	ErrInvalidRequestBody = errors.New("invalid request body")
 	ErrInvalidFieldValuse = errors.New("invalid field value")
+	ErrInvalidUserName    = errors.New("invalid user name, min 4 symbols")
 )

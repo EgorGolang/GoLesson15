@@ -13,14 +13,20 @@ var (
 	defaultTTL = time.Minute * 5
 )
 
-func (s *Service) GetAllUsers(ctx context.Context) (users []models.User, err error) {
+func (s *Service) GetAllUsers() (users []models.User, err error) {
+	ctx := context.Background()
 	users, err = s.repository.GetAllUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
-func (s *Service) CreateUser(ctx context.Context, user models.User) (err error) {
+func (s *Service) CreateUser(user models.User) (err error) {
+	ctx := context.Background()
+	if len(user.Name) < 4 {
+		return errs.ErrInvalidUserName
+	}
+
 	err = s.repository.CreateUser(ctx, user)
 	if err != nil {
 		return err
@@ -28,7 +34,8 @@ func (s *Service) CreateUser(ctx context.Context, user models.User) (err error) 
 	return nil
 }
 
-func (s *Service) GetUserByID(ctx context.Context, id int) (user models.User, err error) {
+func (s *Service) GetUserByID(id int) (user models.User, err error) {
+	ctx := context.Background()
 	err = s.cache.Get(ctx, fmt.Sprintf("user_%d", id), &user)
 	if err == nil {
 		return user, nil
@@ -49,7 +56,8 @@ func (s *Service) GetUserByID(ctx context.Context, id int) (user models.User, er
 	return user, nil
 }
 
-func (s *Service) UpdateUserByID(ctx context.Context, user models.User) (err error) {
+func (s *Service) UpdateUserByID(user models.User) (err error) {
+	ctx := context.Background()
 	_, err = s.repository.GetUserByID(ctx, user.ID)
 	if err != nil {
 		if errors.Is(err, errs.ErrNotfound) {
@@ -65,7 +73,8 @@ func (s *Service) UpdateUserByID(ctx context.Context, user models.User) (err err
 	return nil
 }
 
-func (s *Service) DeleteUserByID(ctx context.Context, id int) (err error) {
+func (s *Service) DeleteUserByID(id int) (err error) {
+	ctx := context.Background()
 	_, err = s.repository.GetUserByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, errs.ErrNotfound) {
