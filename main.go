@@ -40,14 +40,14 @@ func main() {
 	}
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("localhost:6379"),
+		Addr: fmt.Sprintf("%s:%s", configs.AppSettings.RedisParams.Host, configs.AppSettings.RedisParams.Port),
 		DB:   configs.AppSettings.RedisParams.Database,
 	})
 
 	cache := repository.NewCache(rdb)
 
-	repository := repository.NewRepository(db)
-	svc := service.NewService(repository, cache)
+	repos := repository.NewRepository(db)
+	svc := service.NewService(repos, cache)
 	ctrl := controller.NewController(svc)
 
 	if err = ctrl.RunServer(fmt.Sprintf(":%s", configs.AppSettings.AppParams.PortRun)); err != nil {

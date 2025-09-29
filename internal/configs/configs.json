@@ -11,7 +11,7 @@
     "user": "postgres",
     "database": "go_lesson_15"
   },
-  "redis-params": {
+  "redis_params": {
     "host": "localhost",
     "port": "6379",
     "database": 0
