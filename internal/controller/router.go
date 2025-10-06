@@ -11,11 +11,21 @@ import (
 func (ctrl Controller) RegisterEndpoints() {
 	ctrl.router.GET("/ping", ctrl.Ping)
 	ctrl.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	ctrl.router.GET("/users", ctrl.GetAllUsers)
-	ctrl.router.POST("/users", ctrl.CreateUser)
-	ctrl.router.GET("/users/:id", ctrl.GetUserByID)
-	ctrl.router.PUT("/users/:id", ctrl.UpdateUserByID)
-	ctrl.router.DELETE("/users/:id", ctrl.DeleteUserByID)
+	authG := ctrl.router.Group("/auth")
+	{
+		authG.POST("/sign-up", ctrl.SignUp)
+		authG.POST("/sign-in", ctrl.SignIn)
+		authG.GET("/refresh", ctrl.RefreshTokenPair)
+	}
+
+	apiG := ctrl.router.Group("/api", ctrl.checkEmployeeAuthentification)
+	{
+		apiG.GET("/users", ctrl.GetAllUsers)
+		apiG.POST("/users", ctrl.checkIsAdmid, ctrl.CreateUser)
+		apiG.GET("/users/:id", ctrl.GetUserByID)
+		apiG.PUT("/users/:id", ctrl.checkIsAdmid, ctrl.UpdateUserByID)
+		apiG.DELETE("/users/:id", ctrl.checkIsAdmid, ctrl.DeleteUserByID)
+	}
 
 }
 

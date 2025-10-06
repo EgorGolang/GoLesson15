@@ -40,9 +40,6 @@ func (s *Service) GetUserByID(id int) (user models.User, err error) {
 	if err == nil {
 		return user, nil
 	}
-	//if errors.Is(err, redis.Nil) {
-	//	return models.User{}, err
-	//}
 	user, err = s.repository.GetUserByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, errs.ErrNotfound) {

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog"
 	"time"
 )
 
@@ -13,7 +14,7 @@ type Cache struct {
 	rdb *redis.Client
 }
 
-func NewCache(client *redis.Client) *Cache {
+func NewCache(client *redis.Client, logger zerolog.Logger) *Cache {
 	return &Cache{
 		rdb: client,
 	}

@@ -4,6 +4,7 @@ type Config struct {
 	AppParams      AppParams      `json:"app_params"`
 	PostgresParams PostgresParams `json:"postgres_params"`
 	RedisParams    RedisParams    `json:"redis_params"`
+	AuthParams     AuthParams     `json:"auth_params"`
 }
 
 type AppParams struct {
@@ -24,4 +25,9 @@ type RedisParams struct {
 	Host     string `json:"host"`
 	Port     string `json:"port"`
 	Database int    `json:"database"`
+}
+
+type AuthParams struct {
+	AccessTokenTtlMinutes int `json:"access_token_ttl_minutes"`
+	RefreshTokenTtlDays   int `json:"refresh_token_ttl_days"`
 }

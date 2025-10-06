@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog"
 	"log"
 	"os"
 )
@@ -17,11 +18,16 @@ import (
 // @contact.name UsersInfo Service
 // @contact.url http://test.com
 // @contact.email test@test.com
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
+	logger := Logger()
 	if err := configs.ReadSettings(); err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err).Msg("failed to read settings")
+		return
 	}
-
+	logger.Info().Msg("read settings")
 	dsn := fmt.Sprintf(` host=%s
 								port=%s
 								user=%s 
@@ -44,17 +50,19 @@ func main() {
 		DB:   configs.AppSettings.RedisParams.Database,
 	})
 
-	cache := repository.NewCache(rdb)
-
-	repos := repository.NewRepository(db)
-	svc := service.NewService(repos, cache)
-	ctrl := controller.NewController(svc)
+	cache := repository.NewCache(rdb, logger)
+	repos := repository.NewRepository(db, logger)
+	svc := service.NewService(repos, cache, logger)
+	ctrl := controller.NewController(svc, logger)
 
 	if err = ctrl.RunServer(fmt.Sprintf(":%s", configs.AppSettings.AppParams.PortRun)); err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err).Msg("failed to start server")
 	}
 
 	if err = db.Close(); err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err).Msg("failed to close db")
 	}
+}
+func Logger() zerolog.Logger {
+	return zerolog.New(os.Stdout).With().Timestamp().Logger()
 }

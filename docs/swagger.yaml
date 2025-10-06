@@ -18,6 +18,36 @@ definitions:
       name:
         type: string
     type: object
+  controller.SignInRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  controller.SignUpRequest:
+    properties:
+      full_name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - full_name
+    - password
+    - username
+    type: object
+  controller.TokenPairResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
   models.User:
     properties:
       age:
@@ -36,22 +66,15 @@ info:
     url: http://test.com
   title: UsersInfo
 paths:
-  /ping:
-    get:
-      description: Проверка сервиса
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controller.CommonResponse'
-      summary: Health-Check
-      tags:
-      - Ping
-  /users:
+  /api/users:
     get:
       description: Получение данных всех пользователей
+      parameters:
+      - description: Вставьте refresh token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -65,6 +88,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
       summary: Получение данных пользователей
       tags:
       - Users
@@ -98,10 +123,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
       summary: Добавление нового пользователя
       tags:
       - Users
-  /users/{id}:
+  /api/users/{id}:
     delete:
       description: Удаление данных пользователя по ID
       parameters:
@@ -129,6 +156,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
       summary: Удаление данных пользователя по ID
       tags:
       - Users
@@ -159,6 +188,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
       summary: Получение данных пользователя по ID
       tags:
       - Users
@@ -199,7 +230,122 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
       summary: Обновление данных пользователя по ID
       tags:
       - Users
+  /auth/refresh:
+    get:
+      description: Обновить пару токенов
+      parameters:
+      - description: вставьте refresh token
+        in: header
+        name: X-Refresh-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.TokenPairResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+      summary: Обновить пару токенов
+      tags:
+      - Auth
+  /auth/sign-in:
+    post:
+      description: Войти в аккаунт
+      parameters:
+      - description: логин и пароль
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.TokenPairResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+      summary: Вход
+      tags:
+      - Auth
+  /auth/sign-up:
+    post:
+      description: Создать новый аккаунт
+      parameters:
+      - description: информация о новом аккаунте
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.CommonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+      summary: Регистрация
+      tags:
+      - Auth
+  /ping:
+    get:
+      description: Проверка сервиса
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.CommonResponse'
+      summary: Health-Check
+      tags:
+      - Ping
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

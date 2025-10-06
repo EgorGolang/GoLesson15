@@ -11,5 +11,9 @@
     "user": "",
     "password": "",
     "database": ""
+  },
+  "auth_params": {
+    "access_token_ttl_minutes": 0,
+    "refresh_token_ttl_days": 0
   }
 }

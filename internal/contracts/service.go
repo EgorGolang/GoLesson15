@@ -2,6 +2,7 @@ package contracts
 
 import (
 	"GoLessonFifteen/internal/models"
+	"context"
 )
 
 //go:generate mockgen -source=service.go -destination=mocks/mock.go
@@ -12,4 +13,6 @@ type ServiceI interface {
 	GetUserByID(id int) (user models.User, err error)
 	UpdateUserByID(user models.User) (err error)
 	DeleteUserByID(id int) (err error)
+	CreateEmployees(ctx context.Context, employees models.Employee) (err error)
+	Authentificate(ctx context.Context, employees models.Employee) (int, models.Role, error)
 }

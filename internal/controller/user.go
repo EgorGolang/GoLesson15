@@ -14,10 +14,12 @@ import (
 // @Description Получение данных всех пользователей
 // @Tags Users
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {array} models.User
 // @Failure 500 {object} CommonError
-// @Router /users [get]
+// @Router /api/users [get]
 func (ctrl *Controller) GetAllUsers(c *gin.Context) {
+
 	user, err := ctrl.service.GetAllUsers()
 	if err != nil {
 		ctrl.HandleError(c, err)
@@ -33,18 +35,19 @@ type CreateUserRequest struct {
 	Email string `json:"email"`
 }
 
-// GetCreateUser
+// CreateUser
 // @Summary Добавление нового пользователя
 // @Description Добавление нового пользователя
 // @Tags Users
 // @Consume json
 // @Produce json
+// @Security BearerAuth
 // @Param request_body body CreateUserRequest true "информания о новом пользователе"
 // @Success 201 {array} models.User
 // @Failure 400 {object} CommonError
 // @Failure 422 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users [post]
+// @Router /api/users [post]
 func (ctrl *Controller) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -67,12 +70,13 @@ func (ctrl *Controller) CreateUser(c *gin.Context) {
 // @Description Получение данных пользователя по ID
 // @Tags Users
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "id продукта"
 // @Success 200 {object} models.User
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users/{id} [get]
+// @Router /api/users/{id} [get]
 func (ctrl *Controller) GetUserByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -94,6 +98,7 @@ func (ctrl *Controller) GetUserByID(c *gin.Context) {
 // @Tags Users
 // @Consume json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "id продукта"
 // @Param request_body body CreateUserRequest true "информация о пользователе"
 // @Success 200 {object} CommonResponse
@@ -101,7 +106,7 @@ func (ctrl *Controller) GetUserByID(c *gin.Context) {
 // @Failure 404 {object} CommonError
 // @Failure 422 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users/{id} [put]
+// @Router /api/users/{id} [put]
 func (ctrl *Controller) UpdateUserByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -135,12 +140,13 @@ func (ctrl *Controller) UpdateUserByID(c *gin.Context) {
 // @Description Удаление данных пользователя по ID
 // @Tags Users
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "id продукта"
 // @Success 200 {object} CommonResponse
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users/{id} [delete]
+// @Router /api/users/{id} [delete]
 func (ctrl *Controller) DeleteUserByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
