@@ -3,40 +3,50 @@ package repository
 import (
 	"GoLessonFifteen/internal/models"
 	"context"
-	"github.com/rs/zerolog"
-	"os"
 )
 
-func (r *Repository) CreateEmployees(ctx context.Context, employee models.Employee) (err error) {
-	logger := zerolog.New(os.Stdout).With().Timestamp().Str("func_name", "Repository.CreateEmployees").Logger()
-	_, err = r.db.ExecContext(ctx, `INSERT INTO employees (full_name, username, password, role) VALUES ($1, $2, $3, $4)`,
-		employee.FullName,
-		employee.Username,
-		employee.Password,
-		employee.Role)
+func (r *Repository) GetAllEmployees(ctx context.Context) (employee []models.Employee, err error) {
+	err = r.db.SelectContext(ctx, &employee, `SELECT name, email, age, id FROM employees ORDER BY id`)
 	if err != nil {
-		logger.Err(err).Msg("Error inserting employee")
+		return nil, r.TranslateError(err)
+	}
+	return employee, err
+}
+
+func (r *Repository) CreateEmployee(ctx context.Context, employee models.Employee) (err error) {
+	_, err = r.db.ExecContext(ctx, `INSERT INTO employees (name, email, age) VALUES ($1, $2, $3)`,
+		employee.Name,
+		employee.Email,
+		employee.Age)
+	if err != nil {
 		return r.TranslateError(err)
 	}
 	return nil
 }
 
-func (r *Repository) GetEmployeesByID(ctx context.Context, id int) (employees models.Employee, err error) {
-	logger := zerolog.New(os.Stdout).With().Timestamp().Str("func_name", "Repository.GetEmployeesById").Logger()
-	if err = r.db.GetContext(ctx, &employees, `SELECT id, full_name, username, password, role, created_at, updated_at 
-	FROM employees WHERE id = $1`, id); err != nil {
-		logger.Err(err).Msg("Error selecting employee")
-		return models.Employee{}, r.TranslateError(err)
-	}
-	return employees, nil
-}
-
-func (r *Repository) GetEmployeesByUsername(ctx context.Context, username string) (employee models.Employee, err error) {
-	logger := zerolog.New(os.Stdout).With().Timestamp().Str("func_name", "Repository.GetEmployeesById").Logger()
-	if err = r.db.GetContext(ctx, &employee, `SELECT id, full_name, username, password, role, created_at, updated_at 
-	FROM employees WHERE username = $1`, username); err != nil {
-		logger.Err(err).Msg("Error selecting employee")
+func (r *Repository) GetEmployeeByID(ctx context.Context, id int) (employee models.Employee, err error) {
+	if err = r.db.GetContext(ctx, &employee, `SELECT id, name, email, age FROM employees WHERE id = $1`, id); err != nil {
 		return models.Employee{}, r.TranslateError(err)
 	}
 	return employee, nil
+}
+
+func (r *Repository) UpdateEmployeeByID(ctx context.Context, employee models.Employee) (err error) {
+	_, err = r.db.ExecContext(ctx, `UPDATE employees SET name=$1, email=$2, age=$3 WHERE id = $4`,
+		employee.Name,
+		employee.Email,
+		employee.Age,
+		employee.ID)
+	if err != nil {
+		return r.TranslateError(err)
+	}
+	return nil
+}
+
+func (r *Repository) DeleteEmployeeByID(ctx context.Context, id int) (err error) {
+	_, err = r.db.ExecContext(ctx, `DELETE FROM employees WHERE id = $1`, id)
+	if err != nil {
+		return r.TranslateError(err)
+	}
+	return nil
 }

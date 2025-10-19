@@ -13,13 +13,13 @@ import (
 	"testing"
 )
 
-func TestHandler_CreateUser(t *testing.T) {
-	type mockBehaviour func(s *mock_contracts.MockServiceI, p models.User)
+func TestHandler_CreateEmployee(t *testing.T) {
+	type mockBehaviour func(s *mock_contracts.MockServiceI, p models.Employee)
 
 	var testTable = []struct {
 		name                 string
 		inputBody            string
-		inputUser            models.User
+		inputUser            models.Employee
 		mockBehaviour        mockBehaviour
 		expectedStatusCode   int
 		expectedResponseBody string
@@ -32,21 +32,21 @@ func TestHandler_CreateUser(t *testing.T) {
 						"email": "PashaKach123r5@kac.com",
 						"age": 21
 					}`,
-			inputUser: models.User{
+			inputUser: models.Employee{
 				Name:  "PashaKach12gfd",
 				Email: "PashaKach123r5@kac.com",
 				Age:   21,
 			},
-			mockBehaviour: func(s *mock_contracts.MockServiceI, p models.User) {
+			mockBehaviour: func(s *mock_contracts.MockServiceI, p models.Employee) {
 				s.EXPECT().CreateUser(p).Return(nil)
 			},
 			expectedStatusCode:   http.StatusCreated,
-			expectedResponseBody: `{"message":"User created successfully!"}`,
+			expectedResponseBody: `{"message":"Employee created successfully!"}`,
 		},
 		{
 			name:                 "Empty fields",
 			inputBody:            `{}`,
-			mockBehaviour:        func(s *mock_contracts.MockServiceI, p models.User) {},
+			mockBehaviour:        func(s *mock_contracts.MockServiceI, p models.Employee) {},
 			expectedStatusCode:   http.StatusUnprocessableEntity,
 			expectedResponseBody: `{"error":"invalid field value"}`,
 		},
@@ -58,16 +58,16 @@ func TestHandler_CreateUser(t *testing.T) {
 						"email": "PashaKach123r5@kac.com",
 						"age": 21
 					}`,
-			inputUser: models.User{
+			inputUser: models.Employee{
 				Name:  "Pasha",
 				Email: "PashaKach123r5@kac.com",
 				Age:   21,
 			},
-			mockBehaviour: func(s *mock_contracts.MockServiceI, p models.User) {
+			mockBehaviour: func(s *mock_contracts.MockServiceI, p models.Employee) {
 				s.EXPECT().CreateUser(p).Return(errs.ErrInvalidUserName)
 			},
 			expectedStatusCode:   http.StatusUnprocessableEntity,
-			expectedResponseBody: `{"error":"invalid user name, min 4 symbols"}`,
+			expectedResponseBody: `{"error":"invalid employee name, min 4 symbols"}`,
 		},
 	}
 
@@ -81,7 +81,7 @@ func TestHandler_CreateUser(t *testing.T) {
 
 			handler := NewController(svc)
 			r := gin.New()
-			r.POST("/users", handler.CreateUser)
+			r.POST("/users", handler.CreateEmployee)
 
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodPost, "/users", bytes.NewBufferString(testCase.inputBody))

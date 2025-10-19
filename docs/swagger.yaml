@@ -9,7 +9,7 @@ definitions:
       message:
         type: string
     type: object
-  controller.CreateUserRequest:
+  controller.CreateEmployeeRequest:
     properties:
       age:
         type: integer
@@ -48,7 +48,7 @@ definitions:
       refresh_token:
         type: string
     type: object
-  models.User:
+  models.Employee:
     properties:
       age:
         type: integer
@@ -66,15 +66,9 @@ info:
     url: http://test.com
   title: UsersInfo
 paths:
-  /api/users:
+  /api/employees:
     get:
       description: Получение данных всех пользователей
-      parameters:
-      - description: Вставьте refresh token
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -82,7 +76,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.User'
+              $ref: '#/definitions/models.Employee'
             type: array
         "500":
           description: Internal Server Error
@@ -92,7 +86,7 @@ paths:
       - BearerAuth: []
       summary: Получение данных пользователей
       tags:
-      - Users
+      - Employees
     post:
       description: Добавление нового пользователя
       parameters:
@@ -101,7 +95,7 @@ paths:
         name: request_body
         required: true
         schema:
-          $ref: '#/definitions/controller.CreateUserRequest'
+          $ref: '#/definitions/controller.CreateEmployeeRequest'
       produces:
       - application/json
       responses:
@@ -109,7 +103,7 @@ paths:
           description: Created
           schema:
             items:
-              $ref: '#/definitions/models.User'
+              $ref: '#/definitions/models.Employee'
             type: array
         "400":
           description: Bad Request
@@ -127,8 +121,8 @@ paths:
       - BearerAuth: []
       summary: Добавление нового пользователя
       tags:
-      - Users
-  /api/users/{id}:
+      - Employees
+  /api/employees/{id}:
     delete:
       description: Удаление данных пользователя по ID
       parameters:
@@ -160,7 +154,7 @@ paths:
       - BearerAuth: []
       summary: Удаление данных пользователя по ID
       tags:
-      - Users
+      - Employees
     get:
       description: Получение данных пользователя по ID
       parameters:
@@ -175,7 +169,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.Employee'
         "400":
           description: Bad Request
           schema:
@@ -192,7 +186,7 @@ paths:
       - BearerAuth: []
       summary: Получение данных пользователя по ID
       tags:
-      - Users
+      - Employees
     put:
       description: Обновление данных пользователя по ID
       parameters:
@@ -206,7 +200,7 @@ paths:
         name: request_body
         required: true
         schema:
-          $ref: '#/definitions/controller.CreateUserRequest'
+          $ref: '#/definitions/controller.CreateEmployeeRequest'
       produces:
       - application/json
       responses:
@@ -234,7 +228,7 @@ paths:
       - BearerAuth: []
       summary: Обновление данных пользователя по ID
       tags:
-      - Users
+      - Employees
   /auth/refresh:
     get:
       description: Обновить пару токенов

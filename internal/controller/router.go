@@ -2,6 +2,7 @@ package controller
 
 import (
 	_ "GoLessonFifteen/docs"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -18,13 +19,13 @@ func (ctrl Controller) RegisterEndpoints() {
 		authG.GET("/refresh", ctrl.RefreshTokenPair)
 	}
 
-	apiG := ctrl.router.Group("/api", ctrl.checkEmployeeAuthentification)
+	apiG := ctrl.router.Group("/api", ctrl.checkUserAuthentification)
 	{
-		apiG.GET("/users", ctrl.GetAllUsers)
-		apiG.POST("/users", ctrl.checkIsAdmid, ctrl.CreateUser)
-		apiG.GET("/users/:id", ctrl.GetUserByID)
-		apiG.PUT("/users/:id", ctrl.checkIsAdmid, ctrl.UpdateUserByID)
-		apiG.DELETE("/users/:id", ctrl.checkIsAdmid, ctrl.DeleteUserByID)
+		apiG.GET("/employees", ctrl.GetAllEmployees)
+		apiG.POST("/employees", ctrl.checkIsAdmid, ctrl.CreateEmployee)
+		apiG.GET("/employees/:id", ctrl.GetEmployeeByID)
+		apiG.PUT("/employees/:id", ctrl.checkIsAdmid, ctrl.UpdateEmployeeByID)
+		apiG.DELETE("/employees/:id", ctrl.checkIsAdmid, ctrl.DeleteEmployeeByID)
 	}
 
 }
@@ -41,6 +42,7 @@ func (ctrl *Controller) Ping(c *gin.Context) {
 }
 
 func (ctrl *Controller) RunServer(address string) error {
+	pprof.Register(ctrl.router)
 	ctrl.RegisterEndpoints()
 	if err := ctrl.router.Run(address); err != nil {
 		return err

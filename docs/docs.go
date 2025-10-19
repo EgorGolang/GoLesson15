@@ -19,7 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/users": {
+        "/api/employees": {
             "get": {
                 "security": [
                     {
@@ -31,25 +31,16 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Получение данных пользователей",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Вставьте refresh token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.User"
+                                "$ref": "#/definitions/models.Employee"
                             }
                         }
                     },
@@ -72,7 +63,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Добавление нового пользователя",
                 "parameters": [
@@ -82,7 +73,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.CreateUserRequest"
+                            "$ref": "#/definitions/controller.CreateEmployeeRequest"
                         }
                     }
                 ],
@@ -92,7 +83,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.User"
+                                "$ref": "#/definitions/models.Employee"
                             }
                         }
                     },
@@ -117,7 +108,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}": {
+        "/api/employees/{id}": {
             "get": {
                 "security": [
                     {
@@ -129,7 +120,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Получение данных пользователя по ID",
                 "parameters": [
@@ -145,7 +136,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.Employee"
                         }
                     },
                     "400": {
@@ -179,7 +170,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Обновление данных пользователя по ID",
                 "parameters": [
@@ -196,7 +187,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.CreateUserRequest"
+                            "$ref": "#/definitions/controller.CreateEmployeeRequest"
                         }
                     }
                 ],
@@ -244,7 +235,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Удаление данных пользователя по ID",
                 "parameters": [
@@ -467,7 +458,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controller.CreateUserRequest": {
+        "controller.CreateEmployeeRequest": {
             "type": "object",
             "properties": {
                 "age": {
@@ -526,7 +517,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
+        "models.Employee": {
             "type": "object",
             "properties": {
                 "age": {

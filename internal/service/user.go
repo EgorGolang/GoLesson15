@@ -3,86 +3,48 @@ package service
 import (
 	"GoLessonFifteen/internal/errs"
 	"GoLessonFifteen/internal/models"
+	"GoLessonFifteen/utils"
 	"context"
 	"errors"
-	"fmt"
-	"time"
 )
 
-var (
-	defaultTTL = time.Minute * 5
-)
-
-func (s *Service) GetAllUsers() (users []models.User, err error) {
-	ctx := context.Background()
-	users, err = s.repository.GetAllUser(ctx)
+func (s *Service) CreateUsers(ctx context.Context, users models.User) (err error) {
+	_, err = s.repository.GetUsersByUsername(ctx, users.Username)
 	if err != nil {
-		return nil, err
+		if !errors.Is(err, errs.ErrNotfound) {
+			return err
+		}
+	} else {
+		return errs.ErrUsernameAlreadyExists
 	}
-	return users, nil
-}
-func (s *Service) CreateUser(user models.User) (err error) {
-	ctx := context.Background()
-	if len(user.Name) < 4 {
-		return errs.ErrInvalidUserName
+	users.Password, err = utils.GenerateHash(users.Password)
+	if err != nil {
+		return err
 	}
 
-	err = s.repository.CreateUser(ctx, user)
-	if err != nil {
+	users.Role = models.RoleUser
+
+	if err = s.repository.CreateUser(ctx, users); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Service) GetUserByID(id int) (user models.User, err error) {
-	ctx := context.Background()
-	err = s.cache.Get(ctx, fmt.Sprintf("user_%d", id), &user)
-	if err == nil {
-		return user, nil
-	}
-	user, err = s.repository.GetUserByID(ctx, id)
+func (s *Service) Authentificate(ctx context.Context, users models.User) (int, models.Role, error) {
+	userFromDB, err := s.repository.GetUsersByUsername(ctx, users.Username)
 	if err != nil {
-		if errors.Is(err, errs.ErrNotfound) {
-			return models.User{}, errs.ErrUserNotFound
+		if !errors.Is(err, errs.ErrNotfound) {
+			return 0, "", errs.ErrEmployeeNotFound
 		}
-		return models.User{}, err
+		return 0, "", err
 	}
-	if err = s.cache.Set(ctx, fmt.Sprintf("user_%d", user.ID), user, defaultTTL); err != nil {
-		fmt.Printf("error during cache set: %v", err.Error())
-	}
-	return user, nil
-}
-
-func (s *Service) UpdateUserByID(user models.User) (err error) {
-	ctx := context.Background()
-	_, err = s.repository.GetUserByID(ctx, user.ID)
+	users.Password, err = utils.GenerateHash(users.Password)
 	if err != nil {
-		if errors.Is(err, errs.ErrNotfound) {
-			return errs.ErrUserNotFound
-		}
-		return err
+		return 0, "", err
+	}
+	if users.Password != userFromDB.Password {
+		return 0, "", errs.ErrIncorrectUsernameOrPassword
 	}
 
-	err = s.repository.UpdateUserByID(ctx, user)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Service) DeleteUserByID(id int) (err error) {
-	ctx := context.Background()
-	_, err = s.repository.GetUserByID(ctx, id)
-	if err != nil {
-		if errors.Is(err, errs.ErrNotfound) {
-			return errs.ErrUserNotFound
-		}
-		return err
-	}
-
-	err = s.repository.DeleteUserByID(ctx, id)
-	if err != nil {
-		return err
-	}
-	return nil
+	return userFromDB.ID, userFromDB.Role, nil
 }

@@ -8,11 +8,11 @@ import (
 //go:generate mockgen -source=service.go -destination=mocks/mock.go
 
 type ServiceI interface {
-	GetAllUsers() (users []models.User, err error)
-	CreateUser(user models.User) (err error)
-	GetUserByID(id int) (user models.User, err error)
-	UpdateUserByID(user models.User) (err error)
-	DeleteUserByID(id int) (err error)
-	CreateEmployees(ctx context.Context, employees models.Employee) (err error)
-	Authentificate(ctx context.Context, employees models.Employee) (int, models.Role, error)
+	GetAllEmployees() (employees []models.Employee, err error)
+	CreateEmployee(employee models.Employee) (err error)
+	GetEmployeeByID(id int) (employee models.Employee, err error)
+	UpdateEmployeeByID(employee models.Employee) (err error)
+	DeleteEmployeeByID(id int) (err error)
+	CreateUsers(ctx context.Context, users models.User) (err error)
+	Authentificate(ctx context.Context, users models.User) (int, models.Role, error)
 }

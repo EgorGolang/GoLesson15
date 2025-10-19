@@ -3,48 +3,86 @@ package service
 import (
 	"GoLessonFifteen/internal/errs"
 	"GoLessonFifteen/internal/models"
-	"GoLessonFifteen/utils"
 	"context"
 	"errors"
+	"fmt"
+	"time"
 )
 
-func (s *Service) CreateEmployees(ctx context.Context, employees models.Employee) (err error) {
-	_, err = s.repository.GetEmployeesByUsername(ctx, employees.Username)
+var (
+	defaultTTL = time.Minute * 5
+)
+
+func (s *Service) GetAllEmployees() (employees []models.Employee, err error) {
+	ctx := context.Background()
+	employees, err = s.repository.GetAllEmployees(ctx)
 	if err != nil {
-		if !errors.Is(err, errs.ErrNotfound) {
-			return err
-		}
-	} else {
-		return errs.ErrUsernameAlreadyExists
+		return nil, err
 	}
-	employees.Password, err = utils.GenerateHash(employees.Password)
-	if err != nil {
-		return err
+	return employees, nil
+}
+func (s *Service) CreateEmployee(employee models.Employee) (err error) {
+	ctx := context.Background()
+	if len(employee.Name) < 4 {
+		return errs.ErrInvalidUserName
 	}
 
-	employees.Role = models.RoleUser
-
-	if err = s.repository.CreateEmployees(ctx, employees); err != nil {
+	err = s.repository.CreateEmployee(ctx, employee)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Service) Authentificate(ctx context.Context, employees models.Employee) (int, models.Role, error) {
-	employeeFromDB, err := s.repository.GetEmployeesByUsername(ctx, employees.Username)
+func (s *Service) GetEmployeeByID(id int) (employee models.Employee, err error) {
+	ctx := context.Background()
+	err = s.cache.Get(ctx, fmt.Sprintf("user_%d", id), &employee)
+	if err == nil {
+		return employee, nil
+	}
+	employee, err = s.repository.GetEmployeeByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, errs.ErrNotfound) {
-			return 0, "", errs.ErrEmployeeNotFound
+		if errors.Is(err, errs.ErrNotfound) {
+			return models.Employee{}, errs.ErrUserNotFound
 		}
-		return 0, "", err
+		return models.Employee{}, err
 	}
-	employees.Password, err = utils.GenerateHash(employees.Password)
+	if err = s.cache.Set(ctx, fmt.Sprintf("user_%d", employee.ID), employee, defaultTTL); err != nil {
+		fmt.Printf("error during cache set: %v", err.Error())
+	}
+	return employee, nil
+}
+
+func (s *Service) UpdateEmployeeByID(employee models.Employee) (err error) {
+	ctx := context.Background()
+	_, err = s.repository.GetEmployeeByID(ctx, employee.ID)
 	if err != nil {
-		return 0, "", err
-	}
-	if employees.Password != employeeFromDB.Password {
-		return 0, "", errs.ErrIncorrectUsernameOrPassword
+		if errors.Is(err, errs.ErrNotfound) {
+			return errs.ErrUserNotFound
+		}
+		return err
 	}
 
-	return employeeFromDB.ID, employeeFromDB.Role, nil
+	err = s.repository.UpdateEmployeeByID(ctx, employee)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Service) DeleteEmployeeByID(id int) (err error) {
+	ctx := context.Background()
+	_, err = s.repository.GetEmployeeByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, errs.ErrNotfound) {
+			return errs.ErrUserNotFound
+		}
+		return err
+	}
+
+	err = s.repository.DeleteEmployeeByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

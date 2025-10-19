@@ -33,7 +33,7 @@ func (ctrl *Controller) SignUp(c *gin.Context) {
 		ctrl.HandleError(c, errors.Join(errs.ErrInvalidRequestBody, err))
 		return
 	}
-	if err := ctrl.service.CreateEmployees(c, models.Employee{
+	if err := ctrl.service.CreateUsers(c, models.User{
 		FullName: input.FullName,
 		Password: input.Password,
 		Username: input.Username,
@@ -41,7 +41,7 @@ func (ctrl *Controller) SignUp(c *gin.Context) {
 		ctrl.HandleError(c, err)
 		return
 	}
-	c.JSON(http.StatusCreated, CommonResponse{Message: "Employees successfully created"})
+	c.JSON(http.StatusCreated, CommonResponse{Message: "Users successfully created"})
 }
 
 type SignInRequest struct {
@@ -73,7 +73,7 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 		return
 	}
 
-	employeeID, employeeRole, err := ctrl.service.Authentificate(c, models.Employee{
+	userID, userRole, err := ctrl.service.Authentificate(c, models.User{
 		Username: input.Username,
 		Password: input.Password,
 	})
@@ -82,7 +82,7 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := ctrl.generateNewTokenPair(employeeID, employeeRole)
+	accessToken, refreshToken, err := ctrl.generateNewTokenPair(userID, userRole)
 	if err != nil {
 		ctrl.HandleError(c, err)
 		return
@@ -116,7 +116,7 @@ func (ctrl *Controller) RefreshTokenPair(c *gin.Context) {
 		return
 	}
 
-	employeeID, isRefresh, employeeRole, err := pkg.ParseToken(token)
+	userID, isRefresh, userRole, err := pkg.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: err.Error()})
 		return
@@ -125,7 +125,7 @@ func (ctrl *Controller) RefreshTokenPair(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: "inappropriate token"})
 		return
 	}
-	accessToken, refreshToken, err := ctrl.generateNewTokenPair(employeeID, employeeRole)
+	accessToken, refreshToken, err := ctrl.generateNewTokenPair(userID, userRole)
 	if err != nil {
 		ctrl.HandleError(c, err)
 		return

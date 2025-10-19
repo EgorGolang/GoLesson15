@@ -9,7 +9,7 @@
         }
     },
     "paths": {
-        "/api/users": {
+        "/api/employees": {
             "get": {
                 "security": [
                     {
@@ -21,25 +21,16 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Получение данных пользователей",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Вставьте refresh token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.User"
+                                "$ref": "#/definitions/models.Employee"
                             }
                         }
                     },
@@ -62,7 +53,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Добавление нового пользователя",
                 "parameters": [
@@ -72,7 +63,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.CreateUserRequest"
+                            "$ref": "#/definitions/controller.CreateEmployeeRequest"
                         }
                     }
                 ],
@@ -82,7 +73,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.User"
+                                "$ref": "#/definitions/models.Employee"
                             }
                         }
                     },
@@ -107,7 +98,7 @@
                 }
             }
         },
-        "/api/users/{id}": {
+        "/api/employees/{id}": {
             "get": {
                 "security": [
                     {
@@ -119,7 +110,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Получение данных пользователя по ID",
                 "parameters": [
@@ -135,7 +126,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.Employee"
                         }
                     },
                     "400": {
@@ -169,7 +160,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Обновление данных пользователя по ID",
                 "parameters": [
@@ -186,7 +177,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.CreateUserRequest"
+                            "$ref": "#/definitions/controller.CreateEmployeeRequest"
                         }
                     }
                 ],
@@ -234,7 +225,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Employees"
                 ],
                 "summary": "Удаление данных пользователя по ID",
                 "parameters": [
@@ -457,7 +448,7 @@
                 }
             }
         },
-        "controller.CreateUserRequest": {
+        "controller.CreateEmployeeRequest": {
             "type": "object",
             "properties": {
                 "age": {
@@ -516,7 +507,7 @@
                 }
             }
         },
-        "models.User": {
+        "models.Employee": {
             "type": "object",
             "properties": {
                 "age": {

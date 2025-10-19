@@ -27,17 +27,17 @@ func (ctrl *Controller) extractTokenFromHeader(c *gin.Context, headerKey string)
 	return headerParts[1], nil
 }
 
-func (ctrl *Controller) generateNewTokenPair(employeeID int, employeeRole models.Role) (string, string, error) {
-	accessToken, err := pkg.GenerateToken(employeeID,
+func (ctrl *Controller) generateNewTokenPair(userID int, userRole models.Role) (string, string, error) {
+	accessToken, err := pkg.GenerateToken(userID,
 		configs.AppSettings.AuthParams.AccessTokenTtlMinutes,
-		employeeRole, false)
+		userRole, false)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := pkg.GenerateToken(employeeID,
+	refreshToken, err := pkg.GenerateToken(userID,
 		configs.AppSettings.AuthParams.RefreshTokenTtlDays,
-		employeeRole, true)
+		userRole, true)
 	if err != nil {
 		return "", "", err
 	}
